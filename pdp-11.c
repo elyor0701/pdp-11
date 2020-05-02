@@ -39,10 +39,15 @@ int main() {
 	return 0;
 }
 
+void w_write(Adress a, word w){
+	word k = w << 8;
+}
+
 word w_read(Adress a){
 	word w = ((word)mem[a+1]) << 8;
-	//printf("w = %x\n", w);
+	printf("w1 = %x\n", w);
 	w = w | mem[a];
+	printf("w2 = %x\n", w);	
 	return w;
 }
 
