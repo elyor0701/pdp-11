@@ -19,7 +19,7 @@ void test_mem() {
 	// write byte, read byte
 	b_write(2, b0);
 	byte bres = b_read(2);
-	printf("%02hhx = %02hhx\n", b0, bres);
+	//printf("%02hhx = %02hhx\n", b0, bres);
 	assert(b0 == bres);
 	
 	// write 2 byte, read word
@@ -30,7 +30,14 @@ void test_mem() {
 	b_write(a, b0);
 	b_write(a+1, b1);
 	word wres = w_read(a);
-	printf("ww/br\t %04hx = %02hhx%02hhx\n", wres, b1, b0);
+	//printf("ww/br\t %04hx = %02hhx%02hhx\n", wres, b1, b0);
+	assert(w == wres);
+	
+	// write word, read word
+	a = 6;
+	w_write(a, w);
+	wres = w_read(a);
+	printf("ww/wr\t %04hx = %04hx\n", wres, w);
 	assert(w == wres);
 }
 	
@@ -40,20 +47,24 @@ int main() {
 }
 
 void w_write(Adress a, word w){
-	word k = w << 8;
+	mem[a] = w & 0xFF;
+	//printf("%02x\n", mem[a]);
+	mem[a+1] = (w  >> 8) & 0xFF;
+	//printf("%02x\n", mem[a+1]);
 }
 
 word w_read(Adress a){
 	word w = ((word)mem[a+1]) << 8;
-	printf("w1 = %x\n", w);
+	//printf("w1 = %x\n", w);
 	w = w | mem[a];
-	printf("w2 = %x\n", w);	
+	//printf("w2 = %x\n", w);	
 	return w;
 }
 
 void b_write(Adress adr, byte b) {
 	mem[adr] = b;
 }
+
 
 byte b_read(Adress adr) {
 	return mem[adr];
