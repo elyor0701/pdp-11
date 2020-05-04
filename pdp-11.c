@@ -13,6 +13,8 @@ void b_write(Adress adr, byte b);
 byte b_read(Adress adr);
 void w_write(Adress adr, word w);
 word w_read(Adress adr);
+void load_file(const char * filename);
+void dump(Adress adr, int N);
 
 void test_mem() {
 	byte b0 = 0x0a;
@@ -41,19 +43,26 @@ void test_mem() {
 	assert(w == wres);
 }
 	
-int main() {
+int main(int argc, char * argv[]) {
+	if(argc > 1) {
+		load_file(argv[1]);
+	} else {
+		assert(argc > 1);
+	}
+	dump(0x200, 12);
+	dump(0x400, 3);
 	test_mem();
 	return 0;
 }
 
-void w_write(Adress a, word w){
+void w_write(Adress a, word w){			//write word to  memory
 	mem[a] = w & 0xFF;
 	//printf("%02x\n", mem[a]);
 	mem[a+1] = (w  >> 8) & 0xFF;
 	//printf("%02x\n", mem[a+1]);
 }
 
-word w_read(Adress a){
+word w_read(Adress a){					//read word from memory
 	word w = ((word)mem[a+1]) << 8;
 	//printf("w1 = %x\n", w);
 	w = w | mem[a];
@@ -61,11 +70,35 @@ word w_read(Adress a){
 	return w;
 }
 
-void b_write(Adress adr, byte b) {
+void b_write(Adress adr, byte b) {		//write byte to memory
 	mem[adr] = b;
 }
 
 
-byte b_read(Adress adr) {
+byte b_read(Adress adr) {				//read in bytes
 	return mem[adr];
+}
+
+void load_file(const char * filename){	//loads file
+	FILE * fin;
+	fin = fopen(filename, "r");
+	word adr = 0, N = 0;
+	while(fscanf(fin, "%4hx %4hx", &adr, &N) > 0){
+		word i;
+		byte temp;
+		for(i = 0x0000; i < N; i++){
+			fscanf(fin, "%2hhx", &temp);
+			b_write(adr + i, temp);
+		}
+	}
+	fclose(fin);
+}
+		
+void dump(Adress adr, int N){			//dumping memory
+	int i;
+	printf("Dumping memory from 0x%04hx addr.\n", adr);
+	for(i = 0; i < N; i++){
+		printf("%02hhx\t", b_read(adr + i));
+	}
+	printf("\n");
 }
